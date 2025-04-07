@@ -12,7 +12,7 @@ import ast
 from volcenginesdkarkruntime import Ark
 def model_output(content):
 
-    api_key = '67e1719b-fc92-43b7-979d-3692135428a4'
+    api_key = os.getenv('API_KEY')
 
     model = "doubao-1.5-pro-32k-250115"
     # 初始化Ark客户端
