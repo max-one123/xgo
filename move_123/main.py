@@ -104,7 +104,7 @@ from datetime import datetime
 #---------------------------豆包------------------------------
 from audio import start_recording  #录音
 from language_recognize import test_one #调用大模型将语音转化为文字识别
-#--------------------------INIT-------------------------------
+#--------------------------初始化-------------------------------
 dog = XGO(port='/dev/ttyAMA0', version="xgomini")
 fm = dog.read_firmware()
 if fm[0] == 'M':
