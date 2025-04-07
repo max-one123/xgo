@@ -28,7 +28,7 @@ import time
 import websockets
 
 appid = "3984980014"
-token = "dME9mE6J4NWygiMFg6vhrqQ2S49TY2FX"
+token = api_key = os.getenv('token')
 cluster = "volcengine_input_common"
 audio_path = "recorded_audio.wav"
 audio_format = "wav"
