@@ -12,3 +12,5 @@ language_recognize.py中也有一个密钥需要配置
 如需添加其他功能，可以在大模型调用的prompt给出，并同步修改后续运动
 
 可视化相关的代码在main.py已经注释掉
+
+# ball_catch.py是抓球程序，具体用法代码中有注释
