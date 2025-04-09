@@ -123,6 +123,7 @@ class simplePID:
         self.timeOfLastCall = None
         self.setPoint = np.array(target)
         self.integrator_max = float('inf')
+        
 
     def update(self, current_value):
         """
@@ -174,7 +175,9 @@ class LineDetect:
         self.FollowLinePID = (50, 0, 30)
         self.PID_init()
         self.dog = XGO(port='/dev/ttyAMA0', version="xgolite")
+        self.dog_type = 'L'
         self.dog_init()
+        
     def execute(self, point_x, point_y, radius):
         """
         根据检测到的圆形信息，通过PID控制器控制机械狗转向
@@ -183,17 +186,24 @@ class LineDetect:
         :param radius: 检测到的圆形的半径
         """
         [z_Pid, _] = self.PID_controller.update([(point_x - 150), 0])  #如果狗的运动在线的左边，需要调小150，反之增大。
+        if self.dog_type == 'L':
+            runtime_x = 0.2
+            runtime_x += 0.02*abs(int(z_Pid))
+            runtime_x = min(abs(runtime_x),0.8)
+            turn_speed = int(min(1.1 * abs(z_Pid), 18))
+        else:
+            runtime_x = 0.3
+            runtime_x += 0.02*abs(int(z_Pid))
+            runtime_x = min(abs(runtime_x),0.8)
+            turn_speed = int(min(1.1 * abs(z_Pid), 18))
         if abs(z_Pid) < 8:  # 当转向角度较小时，前进
             self.dog.turn(0)
             # self.dog.gait_type(mode)
             self.dog.move_x(8)
         elif abs(z_Pid)>=8:
             fuhao = abs(z_Pid)/z_Pid
-            turn_speed = fuhao * int(min(1.1 * abs(z_Pid), 18))
+            turn_speed = fuhao * turn_speed
             self.dog.turn(turn_speed)
-            runtime_x = 0.2
-            runtime_x += 0.02*abs(int(z_Pid))
-            runtime_x = min(abs(runtime_x),0.8)
             if abs(turn_speed) >= 10:
                 run_speed = 2
             else :
@@ -214,6 +224,16 @@ class LineDetect:
         """
         初始化机械狗的状态，包括停止、设置速度、调整位置和角度等
         """
+        fm = self.dog.read_firmware()
+        print(fm)
+        if fm[0] == 'M':
+            print('XGO-MINI')
+            self.dog = XGO(port='/dev/ttyAMA0', version="xgomini")
+            self.dog_type = 'M'
+        else:
+            print('XGO-LITE')
+            self.dog = XGO(port='/dev/ttyAMA0', version="xgolite")
+            self.dog_type = 'L'
         self.dog.stop()
         self.dog.pace('normal')
         self.dog.translation('z', 75)
